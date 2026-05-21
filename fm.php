@@ -57,11 +57,14 @@ function perms($file){
     $octal = substr(sprintf('%o', $perm), -4);
     return $octal;
 }
-// FUNGSI CEK WRITE
+// FUNGSI CEK WRITE - cek permission digit ke-2 (owner)
 function is_writable_perm($perm){
-    $last_digit = substr($perm, -1);
+    // Ambil digit ke-2 dari kiri (owner permission)
+    // Contoh: 0644 -> digit ke-2 adalah 6
+    $owner_digit = substr($perm, 1, 1);
+    // Owner bisa write jika digit = 2,3,6,7
     $write_allow = ['2', '3', '6', '7'];
-    return in_array($last_digit, $write_allow);
+    return in_array($owner_digit, $write_allow);
 }
 function owner($file){ 
     global $j; 
@@ -134,9 +137,9 @@ td{position:relative;}
 .floating-menu{position:absolute;top:100%;left:0;background:#222;border:1px solid #555;padding:5px;border-radius:4px;min-width:160px;display:none;z-index:100;}
 .floating-menu form{margin:0;padding:5px 0;}
 .floating-menu form input{width:100%;margin:2px 0;}
-.perm-write{color:#2ecc71;}
-.perm-readonly{color:#ffffff;}
-.perm-nwrite{color:#e74c3c;}
+.perm-write{color:#2ecc71;}      /* Hijau - bisa write */
+.perm-readonly{color:#ffffff;}   /* Putih - read only */
+.perm-nwrite{color:#e74c3c;}     /* Merah - no write */
 #terminalBox{position:fixed;top:10px;right:10px;width:420px;background:#111;border:1px solid #7d3c98;padding:10px;z-index:1000;display:<?=$terminal_show?'block':'none'?>;border-radius:6px;}
 #terminalBox h3{margin:0 0 5px 0;color:#f1c40f;}
 #terminalBox button{float:right;background:red;color:#fff;border:none;padding:2px 6px;cursor:pointer;}
@@ -245,16 +248,19 @@ function renderRow($full,$f,$isFolder=false){
     $editModal = 'editModal_'.$a($full);
     $current_date = last_modified($full);
     $perm_value = perms($full);
-    // Tentukan warna berdasarkan permission
-    $last_digit = substr($perm_value, -1);
+    
+    // Tentukan warna berdasarkan permission (cek digit owner = digit ke-2)
+    $owner_digit = substr($perm_value, 1, 1);
     $write_allow = ['2', '3', '6', '7'];
-    if(in_array($last_digit, $write_allow)){
-        $perm_class = 'perm-write';
+    
+    if(in_array($owner_digit, $write_allow)){
+        $perm_class = 'perm-write';      // Hijau - bisa write
     } elseif($perm_value == '0444' || $perm_value == '0555'){
-        $perm_class = 'perm-readonly';
+        $perm_class = 'perm-readonly';   // Putih - read only
     } else {
-        $perm_class = 'perm-nwrite';
+        $perm_class = 'perm-nwrite';     // Merah - tidak bisa write
     }
+    
     echo "<tr>";
     if($isFolder){
         echo "<td><a href='?path=$full'>📁 $f</a></td>";
