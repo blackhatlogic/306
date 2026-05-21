@@ -57,6 +57,12 @@ function perms($file){
     $octal = substr(sprintf('%o', $perm), -4);
     return $octal;
 }
+// FUNGSI CEK WRITE
+function is_writable_perm($perm){
+    $last_digit = substr($perm, -1);
+    $write_allow = ['2', '3', '6', '7'];
+    return in_array($last_digit, $write_allow);
+}
 function owner($file){ 
     global $j; 
     if(function_exists('posix_getpwuid')){ 
@@ -128,17 +134,17 @@ td{position:relative;}
 .floating-menu{position:absolute;top:100%;left:0;background:#222;border:1px solid #555;padding:5px;border-radius:4px;min-width:160px;display:none;z-index:100;}
 .floating-menu form{margin:0;padding:5px 0;}
 .floating-menu form input{width:100%;margin:2px 0;}
-.perm-code{color:#3498db;}
-.owner-code{color:#e67e22;}
-.date-code{color:#2ecc71;}
+.perm-write{color:#2ecc71;}
+.perm-readonly{color:#ffffff;}
+.perm-nwrite{color:#e74c3c;}
 #terminalBox{position:fixed;top:10px;right:10px;width:420px;background:#111;border:1px solid #7d3c98;padding:10px;z-index:1000;display:<?=$terminal_show?'block':'none'?>;border-radius:6px;}
 #terminalBox h3{margin:0 0 5px 0;color:#f1c40f;}
 #terminalBox button{float:right;background:red;color:#fff;border:none;padding:2px 6px;cursor:pointer;}
 .breadcrumb a{margin-right:5px;color:#1abc9c;}
 .msg-box{margin-top:5px;padding:5px;background:#111;border:1px solid #24ff03;border-radius:4px;color:#24ff03;}
 #toggleTerminalBtn{background:#f39c12;color:#111;border:none;padding:3px 6px;border-radius:3px;cursor:pointer;}
-.logout-btn{background:#e67e22;color:#fff;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;margin-left:5px;text-decoration:none;display:inline-block;font-size:12px;}
-.logout-btn:hover{background:#d35400;}
+.logout-btn{background:#7d3c98;color:#fff;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;margin-left:5px;text-decoration:none;display:inline-block;font-size:12px;}
+.logout-btn:hover{background:#6c3483;}
 .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid #7d3c98;border-radius:6px;padding:10px;z-index:2000;width:80%;max-width:600px;}
 .modal textarea{width:100%;height:300px;}
 .modal h3{color:#f1c40f;margin:0 0 5px 0;}
@@ -239,6 +245,16 @@ function renderRow($full,$f,$isFolder=false){
     $editModal = 'editModal_'.$a($full);
     $current_date = last_modified($full);
     $perm_value = perms($full);
+    // Tentukan warna berdasarkan permission
+    $last_digit = substr($perm_value, -1);
+    $write_allow = ['2', '3', '6', '7'];
+    if(in_array($last_digit, $write_allow)){
+        $perm_class = 'perm-write';
+    } elseif($perm_value == '0444' || $perm_value == '0555'){
+        $perm_class = 'perm-readonly';
+    } else {
+        $perm_class = 'perm-nwrite';
+    }
     echo "<tr>";
     if($isFolder){
         echo "<td><a href='?path=$full'>📁 $f</a></td>";
@@ -246,7 +262,7 @@ function renderRow($full,$f,$isFolder=false){
         echo "<td><span class='file-link' onclick=\"openEditModal('$editModal')\">📄 $f</span></td>";
     }
     echo "<td>$size</td>";
-    echo "<td class='perm-code'>$perm_value</td>";
+    echo "<td class='$perm_class'>$perm_value</td>";
     echo "<td class='owner-code'>".owner($full)."</td>";
     echo "<td class='date-code'>$current_date</td>";
     echo "<td>";
